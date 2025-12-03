@@ -10,6 +10,6 @@ The system will store all expense data in a file for future retrieval.
 This application will include multiple Graphical User Interfaces (GUIs) and will be implemented using Java.
 
 ## Group Members
-- Jessica Chen (jhc10024)
-- Terry Cao (tc3661)
-- Jennifer Yu (jy4172)
+- [Jessica Chen](https://github.com/jessicahc) (jhc10024)
+- [Terry Cao](https://github.com/cao-exe) (tc3661)
+- [Jennifer Yu](https://github.com/jenniferyuuu) (jy4172)
