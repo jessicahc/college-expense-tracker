@@ -1,7 +1,7 @@
 package main;
 
 import java.io.*;
-import javax.swing.DefaultListModel;
+import java.util.ArrayList;
 
 public class FileManager {
 	private String fileName;
@@ -10,44 +10,33 @@ public class FileManager {
 		this.fileName = fileName;
 	}
 	
-	public DefaultListModel<Expense> read(){
-		DefaultListModel<Expense> lst = new DefaultListModel<>();
-		
+	public ArrayList<Expense> read(){
 		try{
 			FileInputStream f = new FileInputStream(this.fileName);
 			ObjectInputStream is = new ObjectInputStream(f);
 			
-			while (true) {
-				try{
-					Expense expense = (Expense) is.readObject();
-					lst.addElement(expense);
-				}
-				catch(Exception e) {
-					break;
-				}
-			}
+			ArrayList<Expense> lst = (ArrayList<Expense>) is.readObject();
 			is.close();
-			
+			return lst;
+			}
+		//empty file
+		catch(EOFException e) { 
+			return new ArrayList<>();
 		}
 		catch(Exception e) {
 			e.printStackTrace();
+			return new ArrayList<>();
 		}
-		
-		return lst;
 	}
 	
-	public void save(DefaultListModel<Expense> lst){
+	public void save(ArrayList<Expense> lst){
 		try{
 			FileOutputStream f = new FileOutputStream(this.fileName);
 			ObjectOutputStream os = new ObjectOutputStream(f);
-			
-			for (int i = 0; i < lst.getSize(); i++) {
-				Expense expense = lst.getElementAt(i);
-				os.writeObject(expense);
-			}
+			os.writeObject(lst);
 			os.close();
-			
 		}
+		
 		catch(Exception e) {
 			e.printStackTrace();
 		}

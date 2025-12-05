@@ -2,7 +2,6 @@ package main;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -18,6 +17,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.JTableHeader;
+import java.util.ArrayList;
 
 
 public class MainGUI extends JFrame {
@@ -35,54 +35,64 @@ public class MainGUI extends JFrame {
 	private JTableHeader header;
 	private String[] tblColumnNames = {"Date", "Category", "Description", "Amount"};
 	private DefaultTableModel tableModel;
+	private Tracker t;
 
 	/**
 	 * Create the frame.
 	 */
 	public MainGUI() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 485, 334);
+		setBounds(100, 100, 598, 335);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 		
 		lblMainTitle = new JLabel("College Expense Tracker");
-		lblMainTitle.setBounds(166, 6, 159, 16);
+		lblMainTitle.setBounds(225, 16, 159, 16);
 		contentPane.add(lblMainTitle);
 		
 		comboBox = new JComboBox();
 		comboBox.setModel(new DefaultComboBoxModel(new String[] {"All", "Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics"}));
-		comboBox.setBounds(328, 30, 129, 27);
+		comboBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				filter();
+			}
+		});
+		
+		
+		comboBox.setBounds(442, 33, 129, 27);
 		contentPane.add(comboBox);
 		
 		lblTotalTitle = new JLabel("Total:");
-		lblTotalTitle.setBounds(343, 220, 41, 16);
+		lblTotalTitle.setBounds(432, 220, 41, 16);
 		contentPane.add(lblTotalTitle);
 		
 		lblTotalAmount = new JLabel("");
-		lblTotalAmount.setBounds(386, 220, 71, 16);
+		lblTotalAmount.setBounds(474, 220, 71, 16);
 		contentPane.add(lblTotalAmount);
 		
 		btnAddExpense = new JButton("Add");
 		btnAddExpense.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				show_addGUI();
 			}
 		});
-		btnAddExpense.setBounds(124, 248, 117, 29);
+		btnAddExpense.setBounds(182, 248, 117, 29);
 		contentPane.add(btnAddExpense);
 		
 		btnDeleteExpense = new JButton("Delete");
 		btnDeleteExpense.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				delete();
 			}
 		});
-		btnDeleteExpense.setBounds(241, 248, 117, 29);
+		btnDeleteExpense.setBounds(336, 248, 117, 29);
 		contentPane.add(btnDeleteExpense);
 		
 		scrollPane = new JScrollPane();
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(27, 60, 430, 152);
+		scrollPane.setBounds(27, 60, 544, 152);
 		contentPane.add(scrollPane);
 		
 		table = new JTable();
@@ -98,6 +108,43 @@ public class MainGUI extends JFrame {
 		
 		tableModel = new DefaultTableModel(tblColumnNames, 0);
 		table.setModel(tableModel);
-
+		
+		t = new Tracker();
+		loadTable(t.getExpenseList());
+	}
+	
+	void filter() {
+		String category = comboBox.getSelectedItem().toString();
+		ArrayList<Expense> filteredLst = t.filter(category);
+		loadTable(filteredLst);
+	}
+	
+	void show_addGUI() {
+		AddExpenseGUI addGUI = new AddExpenseGUI();
+		addGUI.show();
+	}
+	
+	void delete() {
+		int id = table.getSelectedRow();
+		if (id != -1) {
+			t.deleteExpense(id);
+			loadTable(t.getExpenseList());
+		}
+	}
+	
+	void loadTable(ArrayList<Expense> lst) {
+		tableModel.setRowCount(0);
+		for (Expense e: lst) {
+			Object[] row = new Object[] {
+					e.getDate(),
+					e.getCategory(),
+					e.getDescription(),
+					e.getAmount()
+			};
+			tableModel.addRow(row);
+		}
+		double totalAmount = t.calculateTotal(lst);
+		String formattedTotal = String.format("%.2f", totalAmount);
+		lblTotalAmount.setText("$" + formattedTotal);
 	}
 }
