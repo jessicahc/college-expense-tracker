@@ -120,8 +120,10 @@ public class MainGUI extends JFrame {
 	}
 	
 	void show_addGUI() {
-		AddExpenseGUI addGUI = new AddExpenseGUI();
-		addGUI.show();
+		AddExpenseGUI addGUI = new AddExpenseGUI(t, this);
+		addGUI.setLocationRelativeTo(this);
+	    this.setVisible(false);
+	    addGUI.setVisible(true); 
 	}
 	
 	void delete() {
