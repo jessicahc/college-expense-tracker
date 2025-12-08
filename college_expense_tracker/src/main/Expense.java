@@ -22,9 +22,11 @@ public class Expense implements Serializable{
 	public String getCategory() {
 		return category;
 	}
+	
 	public double getAmount() {
 		return amount;
 	}
+	
 	public String getDescription() {
 		return description;
 	}

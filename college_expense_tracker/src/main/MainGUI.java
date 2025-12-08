@@ -110,7 +110,8 @@ public class MainGUI extends JFrame {
 		table.setModel(tableModel);
 		
 		t = new Tracker();
-		loadTable(t.getExpenseList());
+		ArrayList<Expense> expenseLst = t.getExpenseList();
+		loadTable(expenseLst);
 	}
 	
 	void filter() {
@@ -128,14 +129,17 @@ public class MainGUI extends JFrame {
 	
 	void delete() {
 		int id = table.getSelectedRow();
+		
 		if (id != -1) {
 			t.deleteExpense(id);
-			loadTable(t.getExpenseList());
+			ArrayList<Expense> expenseLst = t.getExpenseList();
+			loadTable(expenseLst);
 		}
 	}
 	
 	void loadTable(ArrayList<Expense> lst) {
 		tableModel.setRowCount(0);
+		
 		for (Expense e: lst) {
 			Object[] row = new Object[] {
 					e.getDate(),
@@ -145,6 +149,7 @@ public class MainGUI extends JFrame {
 			};
 			tableModel.addRow(row);
 		}
+		
 		double totalAmount = t.calculateTotal(lst);
 		String formattedTotal = String.format("%.2f", totalAmount);
 		lblTotalAmount.setText("$" + formattedTotal);

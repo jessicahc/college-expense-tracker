@@ -31,6 +31,7 @@ public class Tracker {
 		}
 		
 		ArrayList<Expense> filteredLst = new ArrayList<>();
+		
 		for (Expense e: expenseLst) {
 			if (e.getCategory().equals(category)) {
 				filteredLst.add(e);
@@ -46,9 +47,7 @@ public class Tracker {
 		for (Expense e: lst) {
 			total += e.getAmount();
 		}
+		
 		return total;
 	}
-	
-	
-	
 }
