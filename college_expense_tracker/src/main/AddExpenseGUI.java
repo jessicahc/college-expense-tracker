@@ -72,7 +72,7 @@ public class AddExpenseGUI extends JFrame {
 		
 		comboBoxCategory = new JComboBox();
 		comboBoxCategory.setBounds(121, 85, 296, 27);
-		comboBoxCategory.setModel(new DefaultComboBoxModel(new String[] {"All", "Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics"}));
+		comboBoxCategory.setModel(new DefaultComboBoxModel(new String[] {"Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics", "Other"}));
 		contentPane.add(comboBoxCategory);
 		
 		lblAmount = new JLabel("Amount:");

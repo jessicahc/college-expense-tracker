@@ -53,7 +53,7 @@ public class MainGUI extends JFrame {
 		contentPane.add(lblMainTitle);
 		
 		comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"All", "Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics"}));
+		comboBox.setModel(new DefaultComboBoxModel(new String[] {"All", "Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics", "Other"}));
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				filter();
@@ -78,7 +78,7 @@ public class MainGUI extends JFrame {
 				show_addGUI();
 			}
 		});
-		btnAddExpense.setBounds(182, 248, 117, 29);
+		btnAddExpense.setBounds(161, 248, 117, 29);
 		contentPane.add(btnAddExpense);
 		
 		btnDeleteExpense = new JButton("Delete");
@@ -87,7 +87,7 @@ public class MainGUI extends JFrame {
 				delete();
 			}
 		});
-		btnDeleteExpense.setBounds(336, 248, 117, 29);
+		btnDeleteExpense.setBounds(311, 248, 117, 29);
 		contentPane.add(btnDeleteExpense);
 		
 		scrollPane = new JScrollPane();
