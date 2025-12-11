@@ -1,17 +1,18 @@
 package main;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.awt.event.ActionEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.Color;
@@ -20,24 +21,25 @@ import javax.swing.table.JTableHeader;
 import java.util.ArrayList;
 
 
-public class MainGUI extends JFrame {
+public class MainGUI extends JFrame implements PropertyChangeListener {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTable table;
 	private JLabel lblMainTitle;
-	private JComboBox comboBox;
+	private JComboBox<String> comboBox;
 	private JLabel lblTotalTitle;
 	private JLabel lblTotalAmount;
 	private JButton btnAddExpense;
 	private JButton btnDeleteExpense;
 	private JScrollPane scrollPane;
 	private JTableHeader header;
-	private String[] tblColumnNames = {"Date", "Category", "Description", "Amount"};
+	private String[] tblColumnNames = {"Date", "Category", "Description", "Amount", "Expense"};
+
 	private DefaultTableModel tableModel;
 	private Tracker t;
 
-	/**
+	/*
 	 * Create the frame.
 	 */
 	public MainGUI() {
@@ -52,14 +54,13 @@ public class MainGUI extends JFrame {
 		lblMainTitle.setBounds(225, 16, 159, 16);
 		contentPane.add(lblMainTitle);
 		
-		comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(new String[] {"All", "Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics", "Other"}));
+		comboBox = new JComboBox<String>();
+		comboBox.setModel(new DefaultComboBoxModel<String>(new String[] {"All", "Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics", "Other"}));
 		comboBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				filter();
 			}
 		});
-		
 		
 		comboBox.setBounds(442, 33, 129, 27);
 		contentPane.add(comboBox);
@@ -106,52 +107,105 @@ public class MainGUI extends JFrame {
 		header.setReorderingAllowed(false);
 		scrollPane.setViewportView(table);
 		
-		tableModel = new DefaultTableModel(tblColumnNames, 0);
+		tableModel = new DefaultTableModel(tblColumnNames, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false;
+			}
+		};
 		table.setModel(tableModel);
 		
-		t = new Tracker();
+		// Hide Expense column that holds Expense objects
+		table.getColumnModel().getColumn(4).setMinWidth(0);
+		table.getColumnModel().getColumn(4).setMaxWidth(0);
+		table.getColumnModel().getColumn(4).setWidth(0);
+		
+		t = Tracker.getInstance();
 		ArrayList<Expense> expenseLst = t.getExpenseList();
 		loadTable(expenseLst);
-	}
-	
-	void filter() {
-		String category = comboBox.getSelectedItem().toString();
-		ArrayList<Expense> filteredLst = t.filter(category);
-		loadTable(filteredLst);
+		
+		t.addPropertyChangeListener(this);
 	}
 	
 	void show_addGUI() {
-		AddExpenseGUI addGUI = new AddExpenseGUI(t, this);
+		AddExpenseGUI addGUI = new AddExpenseGUI();
 		addGUI.setLocationRelativeTo(this);
-	    this.setVisible(false);
 	    addGUI.setVisible(true); 
 	}
 	
 	void delete() {
-		int id = table.getSelectedRow();
-		
-		if (id != -1) {
-			t.deleteExpense(id);
-			ArrayList<Expense> expenseLst = t.getExpenseList();
-			loadTable(expenseLst);
-		}
+	    int row = table.getSelectedRow();
+
+	    if (row == -1) {
+	    	JOptionPane.showMessageDialog(
+	                this,
+	                "Please select a row to delete.",
+	                "No Selection",
+	                JOptionPane.INFORMATION_MESSAGE
+	        );
+	    	return;
+	    }
+
+	    // retrieve hidden Expense object
+	    Expense e = (Expense) table.getModel().getValueAt(row, 4);  
+	    t.deleteExpense(e);
 	}
 	
-	void loadTable(ArrayList<Expense> lst) {
-		tableModel.setRowCount(0);
+	void filter() {
+		String category = comboBox.getSelectedItem().toString();
+	    ArrayList<Expense> expenses = t.getExpenseList();
+
+	    if ("All".equals(category)) {
+	        loadTable(expenses);
+	        return;
+	    }
+
+	    ArrayList<Expense> filtered = new ArrayList<>();
+	    for (Expense e : expenses) {
+	        if (category.equals(e.getCategory())) {
+	            filtered.add(e);
+	        }
+	    }
+	    loadTable(filtered);
+	}
+
+	private void loadTable(ArrayList<Expense> lst) {
+	    tableModel.setRowCount(0);
+
+	    for (Expense e : lst) {
+	        Object[] row = new Object[] {
+	                e.getDate(),
+	                e.getCategory(),
+	                e.getDescription(),
+	                e.getAmount(),
+	                e  // store the expense object in the table
+	        };
+	        tableModel.addRow(row);
+	    }
+
+	    double totalAmount = calculateTotal(lst);
+	    lblTotalAmount.setText("$" + String.format("%.2f", totalAmount));
+	}
+
+	private double calculateTotal(ArrayList<Expense> lst) {
+		double total = 0;
 		
 		for (Expense e: lst) {
-			Object[] row = new Object[] {
-					e.getDate(),
-					e.getCategory(),
-					e.getDescription(),
-					e.getAmount()
-			};
-			tableModel.addRow(row);
+			total += e.getAmount();
 		}
 		
-		double totalAmount = t.calculateTotal(lst);
-		String formattedTotal = String.format("%.2f", totalAmount);
-		lblTotalAmount.setText("$" + formattedTotal);
+		return total;
 	}
+	
+	@Override
+    public void propertyChange(final PropertyChangeEvent evt) {
+		String ce = evt.getPropertyName();
+		System.out.println("MainGUI.propertyChange: " + ce + " detected");
+		if (ce.equals(Tracker.ChangeEvent.EXPENSE_ADDED.toString()) || 
+			ce.equals(Tracker.ChangeEvent.EXPENSE_DELETED.toString())) {
+			comboBox.setSelectedItem("All");
+			filter();  // reload table with current filter applied
+			this.setVisible(true);
+		}
+    }
 }

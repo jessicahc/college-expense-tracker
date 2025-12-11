@@ -15,12 +15,16 @@ public class FileManager {
 			FileInputStream f = new FileInputStream(this.fileName);
 			ObjectInputStream is = new ObjectInputStream(f);
 			
-			ArrayList<Expense> lst = (ArrayList<Expense>) is.readObject();
+			ArrayList<Expense> lst = (ArrayList<Expense>)is.readObject();
 			is.close();
 			return lst;
 			}
-		//empty file
+		// Handle empty file
 		catch(EOFException e) { 
+			return new ArrayList<>();
+		}
+		catch(FileNotFoundException e) {
+			System.out.println(this.fileName + " not found. Creating a new file...");
 			return new ArrayList<>();
 		}
 		catch(Exception e) {
