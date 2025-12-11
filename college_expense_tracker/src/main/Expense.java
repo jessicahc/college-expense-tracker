@@ -1,9 +1,10 @@
 package main;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public class Expense implements Serializable{
-	private java.time.LocalDate date;
+	private LocalDate date;
 	private String category;
 	private String description;
 	private double amount;

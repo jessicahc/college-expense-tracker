@@ -1,6 +1,5 @@
 package main;
 
-import java.awt.EventQueue;
 import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 
@@ -9,10 +8,11 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
-import java.awt.Button;
 import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 
@@ -29,7 +29,7 @@ public class AddExpenseGUI extends JFrame {
 	private JLabel lblDate;
 	private DatePicker datePicker;
 	private JLabel lblCategory;
-	private JComboBox comboBoxCategory;
+	private JComboBox<String> comboBoxCategory;
 	private JLabel lblAmount;
 	private JTextField txtFieldAmount;
 	private JLabel lblDescription;
@@ -37,12 +37,12 @@ public class AddExpenseGUI extends JFrame {
 	private JScrollPane descriptionScrollPane;
 	private JButton btnSaveExpense;
 	private JButton btnExitAddGUI;
-	private MainGUI parent;
-	
+	private Tracker t;
 
-	public AddExpenseGUI(Tracker t, MainGUI parent) {
+	public AddExpenseGUI() {
 		
-		this.parent = parent;
+		this.t = Tracker.getInstance();
+		
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 450, 387);
 		contentPane = new JPanel();
@@ -72,7 +72,10 @@ public class AddExpenseGUI extends JFrame {
 		
 		comboBoxCategory = new JComboBox();
 		comboBoxCategory.setBounds(121, 85, 296, 27);
-		comboBoxCategory.setModel(new DefaultComboBoxModel(new String[] {"Food", "Entertainment", "Transportation", "Tuition and Fees", "Housing", "Books/Materials/Electronics", "Other"}));
+		comboBoxCategory.setModel(new DefaultComboBoxModel<String>(
+								  new String[] {"Food", "Entertainment", "Transportation", 
+										  		"Tuition and Fees", "Housing", 
+										  		"Books/Materials/Electronics", "Other"}));
 		contentPane.add(comboBoxCategory);
 		
 		lblAmount = new JLabel("Amount:");
@@ -102,25 +105,38 @@ public class AddExpenseGUI extends JFrame {
 		
 		btnSaveExpense = new JButton("Save");
 		btnSaveExpense.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				save(t, datePicker.getDate(), 
-						comboBoxCategory.getSelectedItem().toString(), 
-						Double.parseDouble(txtFieldAmount.getText()), 
-						txtFieldDescription.getText() );
-				dispose();
-				parent.loadTable(t.getExpenseList());
-				parent.setVisible(true);
-				dispose();
-				
-			}
+		    public void actionPerformed(ActionEvent e) {
+
+		        double amount;
+
+		        try {
+		            amount = Double.parseDouble(txtFieldAmount.getText());
+		        } 
+		        catch (NumberFormatException ex) {
+		            JOptionPane.showMessageDialog(null, 
+		                "Please enter a valid numeric amount.",
+		                "Invalid Input",
+		                JOptionPane.ERROR_MESSAGE);
+		            return;
+		        }
+
+		        save(t,
+		            datePicker.getDate(),
+		            comboBoxCategory.getSelectedItem().toString(),
+		            amount,
+		            txtFieldDescription.getText()
+		        );
+
+		        dispose();
+		    }
 		});
+
 		btnSaveExpense.setBounds(68, 300, 117, 29);
 		contentPane.add(btnSaveExpense);
 		
 		btnExitAddGUI = new JButton("Exit");
 		btnExitAddGUI.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				parent.setVisible(true);
 				dispose();
 			}
 		});
