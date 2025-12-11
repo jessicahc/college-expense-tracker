@@ -144,6 +144,7 @@ public class AddExpenseGUI extends JFrame {
 		contentPane.add(btnExitAddGUI);
 
 	}
+	
 	public void save(Tracker t, java.time.LocalDate date, String category, double amount, String description) {
 		Expense newExpense = new Expense(date, category, amount, description);
 		t.addExpense(newExpense);

@@ -39,7 +39,7 @@ public class MainGUI extends JFrame implements PropertyChangeListener {
 	private DefaultTableModel tableModel;
 	private Tracker t;
 
-	/**
+	/*
 	 * Create the frame.
 	 */
 	public MainGUI() {

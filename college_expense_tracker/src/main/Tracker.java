@@ -47,7 +47,7 @@ public class Tracker {
 	}
 	
 	public void deleteExpense(Expense e) {
-	    if (expenseLst.remove(e)) {  // returns true if removed successfully
+	    if (expenseLst.remove(e)) { // returns true if removed successfully
 	        f.save(expenseLst);
 	        support.firePropertyChange(ChangeEvent.EXPENSE_DELETED.toString(), e, null);
 	    }

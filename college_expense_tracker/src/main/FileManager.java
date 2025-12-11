@@ -19,7 +19,7 @@ public class FileManager {
 			is.close();
 			return lst;
 			}
-		// Handle empty file
+		// Handle empty file 
 		catch(EOFException e) { 
 			return new ArrayList<>();
 		}

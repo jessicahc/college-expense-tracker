@@ -31,5 +31,4 @@ public class Expense implements Serializable{
 	public String getDescription() {
 		return description;
 	}
-	
 }
